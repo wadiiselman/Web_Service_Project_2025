@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4">Welcome to Tunisia</h1>
+        <p class="lead">Discover the beauty of North Africa's hidden gem</p>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Explore Tunisia</h2>
+            <div id="map" class="mb-4"></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Popular Regions</h3>
+                    <div class="list-group">
+                        <a href="{{ url_for('main.hotels_by_region', region='mahdia') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-hotel"></i> Mahdia
+                        </a>
+                        <a href="{{ url_for('main.hotels_by_region', region='tunis') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-hotel"></i> Tunis
+                        </a>
+                        <a href="{{ url_for('main.hotels_by_region', region='sousse') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-hotel"></i> Sousse
+                        </a>
+                        <a href="{{ url_for('main.hotels_by_region', region='sfax') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-hotel"></i> Sfax
+                        </a>
+                        <a href="{{ url_for('main.hotels_by_region', region='djerba') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-hotel"></i> Djerba
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="featured" class="my-5">
+        <h2>Featured Experiences</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1667159098514-506077625a8b" class="card-img-top" alt="Tunisia Landmark">
+                    <div class="card-body">
+                        <h5 class="card-title">Historical Tours</h5>
+                        <p class="card-text">Explore ancient Roman ruins and traditional medinas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1517176191003-46c068487dd4" class="card-img-top" alt="Mediterranean Beach">
+                    <div class="card-body">
+                        <h5 class="card-title">Beach Getaways</h5>
+                        <p class="card-text">Relax on pristine Mediterranean beaches.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1523044883946-4b4ad5c9bf45" class="card-img-top" alt="Sahara Desert">
+                    <div class="card-body">
+                        <h5 class="card-title">Desert Adventures</h5>
+                        <p class="card-text">Experience the magic of the Sahara.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mapElement = document.getElementById('map');
+        if (mapElement && !mapElement._leaflet_id) {
+            // Initialize map with region markers
+            const map = L.map('map').setView([34.0, 9.0], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add markers for regions
+        const regions = {
+            'Mahdia': [35.5024, 11.0458],
+            'Tunis': [36.8065, 10.1815],
+            'Sousse': [35.8245, 10.6346],
+            'Sfax': [34.7398, 10.7600],
+            'Djerba': [33.8075, 10.8451]
+        };
+
+        for (const [name, coords] of Object.entries(regions)) {
+            L.marker(coords)
+                .bindPopup(`<strong>${name}</strong><br>
+                           <a href="/hotels/${name.toLowerCase()}" class="btn btn-sm btn-primary">View Hotels</a>`)
+                .addTo(map);
+        }
+    }
+    });
+</script>
+{% endblock %}

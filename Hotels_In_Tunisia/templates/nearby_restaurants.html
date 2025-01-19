@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        {% for restaurant in nearby_restaurants %}
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3>{{ restaurant.name }}</h3>
+                    <p><strong>Description:</strong> {{ restaurant.description }}</p>
+
+                    <!-- Activity-like Info Section -->
+                    <div class="activity-info mb-3">
+                        <span><i class="fas fa-utensils"></i> Cuisine Type: {{ restaurant.cuisine_type }}</span>
+                        <span><i class="fas fa-dollar-sign"></i> Price Range: {{ restaurant.price_range }}</span>
+                        <span><i class="fas fa-star"></i> Rating: {{ restaurant.rating }}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> Distance: {{ restaurant.distance }} km</span>
+                    </div>
+
+                    <p><strong>Working Hours:</strong> {{ restaurant.working_hours }}</p>
+                    <p><strong>Menu:</strong> {{ restaurant.menu | tojson }}</p>  <!-- Using tojson to display the JSON data -->
+                    <p><strong>Is Open:</strong> {{ restaurant.is_open }}</p>
+
+                    <!-- Display restaurant images if available -->
+                    {% if restaurant.images %}
+                    <div class="mt-3">
+                        <strong>Images:</strong>
+                        <ul class="list-unstyled">
+                            {% for image in restaurant.images %}
+                            <li><img src="{{ image }}" alt="Restaurant Image" class="img-fluid rounded" style="max-width: 100px; max-height: 100px;"></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

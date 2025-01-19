@@ -1,0 +1,213 @@
+-- PostgreSQL Database Documentation
+
+-- Database Schema and Sample Data
+-- Created: January 09, 2025
+-- Description: Tunisia Tourism Platform Database
+
+-- User Table
+CREATE TABLE "user" (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(64) NOT NULL UNIQUE,
+    email VARCHAR(120) NOT NULL UNIQUE,
+    password_hash VARCHAR(256) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Hotel Table
+CREATE TABLE hotel (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    latitude FLOAT NOT NULL,
+    longitude FLOAT NOT NULL,
+    price_range VARCHAR(20),
+    amenities JSONB,
+    images JSONB,
+    region VARCHAR(50) NOT NULL,
+    rating FLOAT DEFAULT 0.0,
+    admin_id INTEGER NOT NULL REFERENCES "user"(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Restaurant Table
+CREATE TABLE restaurant (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    latitude FLOAT NOT NULL,
+    longitude FLOAT NOT NULL,
+    cuisine_type VARCHAR(50),
+    price_range VARCHAR(20),
+    menu JSONB,
+    images JSONB,
+    region VARCHAR(50) NOT NULL,
+    rating FLOAT DEFAULT 0.0,
+    working_hours JSONB,
+    is_open BOOLEAN DEFAULT FALSE,
+    owner_id INTEGER NOT NULL REFERENCES "user"(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Activity Table
+CREATE TABLE activity (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    latitude FLOAT NOT NULL,
+    longitude FLOAT NOT NULL,
+    activity_type VARCHAR(50),
+    price FLOAT,
+    duration VARCHAR(50),
+    schedule JSONB,
+    images JSONB,
+    region VARCHAR(50) NOT NULL,
+    rating FLOAT DEFAULT 0.0,
+    capacity INTEGER,
+    min_age INTEGER,
+    difficulty_level VARCHAR(20),
+    equipment_provided JSONB,
+    working_hours JSONB,
+    is_open BOOLEAN DEFAULT FALSE,
+    provider_id INTEGER NOT NULL REFERENCES "user"(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Transportation Table
+CREATE TABLE transportation (
+    id SERIAL PRIMARY KEY,
+    from_location VARCHAR(100) NOT NULL,
+    to_location VARCHAR(100) NOT NULL,
+    means VARCHAR(50) NOT NULL,
+    duration INTEGER,
+    price FLOAT,
+    schedule JSONB,
+    stops JSONB,
+    route_map JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sample Data
+
+-- Users
+INSERT INTO "user" (username, email, password_hash, role) VALUES
+('admin_user', 'admin@tunisia-tourism.com', 'hashed_password_1', 'admin'),
+('hotel_admin1', 'manager@luxhotel.com', 'hashed_password_2', 'hotel_admin'),
+('rest_owner1', 'owner@tunisiancuisine.com', 'hashed_password_3', 'restaurant_owner'),
+('activity_provider1', 'guide@adventures.com', 'hashed_password_4', 'activity_provider'),
+('visitor1', 'tourist@example.com', 'hashed_password_5', 'visitor'),
+('mahdia_hotel1', 'manager@mahdiapalace.com', 'hashed_password_6', 'hotel_admin'),
+('mahdia_rest1', 'owner@mahdiaseafood.com', 'hashed_password_7', 'restaurant_owner'),
+('mahdia_guide1', 'guide@mahdiatours.com', 'hashed_password_8', 'activity_provider');
+
+-- Hotels
+INSERT INTO hotel (name, description, latitude, longitude, price_range, amenities, region, rating, admin_id) VALUES
+('Luxury Tunisia Hotel', 'Five-star luxury hotel with sea view', 36.8065, 10.1815, 'luxury', 
+    '{"wifi": true, "pool": true, "spa": true, "restaurant": true}', 'tunis', 4.8, 2),
+('Medina Boutique Hotel', 'Traditional boutique hotel in old medina', 35.8245, 10.6346, 'mid-range',
+    '{"wifi": true, "breakfast": true, "parking": true}', 'sousse', 4.5, 2),
+('Sahara Oasis Resort', 'Desert resort with authentic experience', 33.8075, 10.8451, 'luxury',
+    '{"wifi": true, "pool": true, "desert_tours": true}', 'djerba', 4.7, 2),
+('Mahdia Palace', 'Beachfront luxury resort with private beach access', 35.5024, 11.0458, 'luxury', 
+    '{"wifi": true, "pool": true, "spa": true, "private_beach": true, "tennis_court": true}', 'mahdia', 4.9, 6),
+('Mahdia Beach Hotel', 'Family-friendly hotel near historical sites', 35.5012, 11.0445, 'mid-range',
+    '{"wifi": true, "pool": true, "restaurant": true, "kids_club": true}', 'mahdia', 4.4, 6),
+('Royal Mahdia', 'Boutique hotel in the heart of medina', 35.5036, 11.0429, 'luxury',
+    '{"wifi": true, "spa": true, "historic_view": true, "restaurant": true}', 'mahdia', 4.7, 6),
+('Mahdia Inn', 'Cozy hotel with traditional architecture', 35.5018, 11.0437, 'budget',
+    '{"wifi": true, "breakfast": true, "local_tours": true}', 'mahdia', 4.2, 6);
+
+-- Restaurants
+INSERT INTO restaurant (name, description, latitude, longitude, cuisine_type, price_range, menu, region, rating, owner_id, is_open) VALUES
+('Traditional Flavors', 'Authentic Tunisian cuisine', 36.8000, 10.1800, 'Tunisian', 'mid-range',
+    '{"starters": ["Mechouia", "Brik"], "mains": ["Couscous", "Tajine"]}', 'tunis', 4.6, 3, true),
+('Mediterranean Breeze', 'Fresh seafood restaurant', 35.8200, 10.6300, 'Seafood', 'luxury',
+    '{"seafood": ["Grilled Fish", "Seafood Pasta"], "desserts": ["Baklava"]}', 'sousse', 4.4, 3, true),
+('Mahdia Pearl', 'Premium seafood restaurant with sea view', 35.5028, 11.0452, 'Seafood', 'luxury',
+    '{"seafood": ["Grilled Sea Bass", "Lobster Thermidor"], "specialties": ["Mahdia Fish Soup", "Seafood Couscous"]}', 'mahdia', 4.8, 7, true),
+('Medina Flavors', 'Traditional Tunisian cuisine in old town', 35.5034, 11.0427, 'Tunisian', 'mid-range',
+    '{"starters": ["Harissa Shrimp", "Mechouia"], "mains": ["Fish Tajine", "Grilled Octopus"]}', 'mahdia', 4.6, 7, true),
+('Café Maritime', 'Casual café with Mediterranean dishes', 35.5021, 11.0449, 'Mediterranean', 'budget',
+    '{"breakfast": ["Tunisian Breakfast", "Continental"], "lunch": ["Seafood Pasta", "Fish Sandwich"]}', 'mahdia', 4.3, 7, true);
+
+-- Activities
+INSERT INTO activity (name, description, latitude, longitude, activity_type, price, duration, region, capacity, provider_id, is_open) VALUES
+('Desert Safari Adventure', 'Camel trek through Sahara', 33.8000, 10.8400, 'Adventure', 150.00, '8 hours', 'djerba', 20, 4, true),
+('Medina Walking Tour', 'Historical tour of Tunis Medina', 36.8100, 10.1700, 'Cultural', 30.00, '3 hours', 'tunis', 15, 4, true),
+('Carthage Ruins Explorer', 'Archaeological site visit', 36.8585, 10.3239, 'Historical', 45.00, '4 hours', 'tunis', 25, 4, true),
+('Mahdia Historical Tour', 'Explore the medieval medina and Borj el Kebir', 35.5033, 11.0425, 'Cultural', 35.00, '3 hours', 'mahdia', 15, 8, true),
+('Mahdia Beach Adventure', 'Water sports and beach activities', 35.5026, 11.0460, 'Adventure', 50.00, '4 hours', 'mahdia', 10, 8, true),
+('Sunset Sailing Mahdia', 'Evening cruise along Mahdia coast', 35.5022, 11.0465, 'Leisure', 75.00, '2 hours', 'mahdia', 8, 8, true),
+('Fishing Trip Mahdia', 'Traditional fishing experience', 35.5019, 11.0463, 'Adventure', 60.00, '5 hours', 'mahdia', 6, 8, true);
+
+-- Transportation
+INSERT INTO transportation (from_location, to_location, means, duration, price, schedule, stops) VALUES
+('Tunis Airport', 'Sousse', 'Train', 150, 25.00, 
+    '{"departures": ["09:00", "13:00", "17:00"]}', 
+    '["Hammam Sousse", "Monastir"]'),
+('Sousse', 'Djerba', 'Bus', 300, 35.00,
+    '{"departures": ["08:00", "14:00"]}',
+    '["Sfax", "Gabes"]'),
+('Tunis', 'Mahdia', 'Train', 240, 15.00, 
+    '{"departures": ["07:00", "10:00", "14:00", "18:00"]}', 
+    '["Sousse", "Monastir"]'),
+('Mahdia', 'Sfax', 'Bus', 120, 8.00,
+    '{"departures": ["08:30", "11:30", "15:30"]}',
+    '["Ksour Essef", "Salakta"]'),
+('Monastir Airport', 'Mahdia', 'Shuttle', 45, 25.00,
+    '{"departures": ["Every hour from 06:00 to 22:00"]}',
+    '[]'),
+('Mahdia', 'Djerba', 'Bus', 360, 30.00,
+    '{"departures": ["07:00", "15:00"]}',
+    '["Sfax", "Gabes"]');
+
+-- Example Queries
+
+-- Find all luxury hotels in Tunis
+SELECT name, rating, price_range 
+FROM hotel 
+WHERE region = 'tunis' AND price_range = 'luxury';
+
+-- Find nearby restaurants within 5km of a location
+SELECT name, cuisine_type, 
+       calculate_distance(latitude, longitude, 36.8065, 10.1815) as distance
+FROM restaurant
+WHERE calculate_distance(latitude, longitude, 36.8065, 10.1815) <= 5
+ORDER BY distance;
+
+-- Get all activities with their providers
+SELECT a.name, a.price, a.duration, u.username as provider
+FROM activity a
+JOIN "user" u ON a.provider_id = u.id
+WHERE a.is_open = true;
+
+-- Get available transportation options between locations
+SELECT means, duration, price, schedule
+FROM transportation
+WHERE from_location = 'Tunis Airport' AND to_location = 'Sousse';
+
+-- Find all hotels in Mahdia with private beach access
+SELECT name, rating, amenities 
+FROM hotel 
+WHERE region = 'mahdia' AND amenities->>'private_beach' = 'true';
+
+-- Find seafood restaurants in Mahdia
+SELECT name, cuisine_type, price_range
+FROM restaurant
+WHERE region = 'mahdia' AND cuisine_type = 'Seafood';
+
+-- Get all water-related activities in Mahdia
+SELECT name, price, duration
+FROM activity
+WHERE region = 'mahdia' 
+AND (activity_type = 'Adventure' OR description LIKE '%water%');
+
+-- Find all direct transportation options from Tunis to Mahdia
+SELECT means, duration, price, schedule
+FROM transportation
+WHERE from_location = 'Tunis' AND to_location = 'Mahdia';

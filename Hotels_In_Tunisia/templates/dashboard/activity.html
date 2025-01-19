@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="list-group">
+                        <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="list">Profile</a>
+                        <a href="#schedule" class="list-group-item list-group-item-action" data-bs-toggle="list">Schedule</a>
+                        <a href="#images" class="list-group-item list-group-item-action" data-bs-toggle="list">Images</a>
+                        <a href="#stats" class="list-group-item list-group-item-action" data-bs-toggle="list">Statistics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="profile">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Activity Profile</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="activityProfileForm" method="POST">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Activity Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ activity.name }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3" required>{{ activity.description }}</textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="latitude" class="form-label">Latitude</label>
+                                            <input type="number" step="any" class="form-control" id="latitude" name="latitude" value="{{ activity.latitude }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="longitude" class="form-label">Longitude</label>
+                                            <input type="number" step="any" class="form-control" id="longitude" name="longitude" value="{{ activity.longitude }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="activity_type" class="form-label">Activity Type</label>
+                                            <select class="form-select" id="activity_type" name="activity_type" required>
+                                                <option value="cultural" {% if activity.activity_type == 'cultural' %}selected{% endif %}>Cultural Tour</option>
+                                                <option value="adventure" {% if activity.activity_type == 'adventure' %}selected{% endif %}>Adventure</option>
+                                                <option value="water" {% if activity.activity_type == 'water' %}selected{% endif %}>Water Activity</option>
+                                                <option value="desert" {% if activity.activity_type == 'desert' %}selected{% endif %}>Desert Experience</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="duration" class="form-label">Duration</label>
+                                            <select class="form-select" id="duration" name="duration" required>
+                                                <option value="2_hours" {% if activity.duration == '2_hours' %}selected{% endif %}>2 Hours</option>
+                                                <option value="half_day" {% if activity.duration == 'half_day' %}selected{% endif %}>Half Day</option>
+                                                <option value="full_day" {% if activity.duration == 'full_day' %}selected{% endif %}>Full Day</option>
+                                                <option value="multi_day" {% if activity.duration == 'multi_day' %}selected{% endif %}>Multi-Day</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price per Person (TND)</label>
+                                    <input type="number" step="0.1" class="form-control" id="price" name="price" value="{{ activity.price }}" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="schedule">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Activity Schedule</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="scheduleForm">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="scheduleDate" class="form-label">Date</label>
+                                            <input type="date" class="form-control" id="scheduleDate" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="scheduleTime" class="form-label">Time</label>
+                                            <input type="time" class="form-control" id="scheduleTime" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="capacity" class="form-label">Capacity</label>
+                                            <input type="number" class="form-control" id="capacity" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Add Schedule</button>
+                            </form>
+
+                            <div class="mt-4">
+                                <h6>Upcoming Sessions</h6>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Capacity</th>
+                                                <th>Bookings</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="scheduleItems">
+                                            {% for session in activity.schedule %}
+                                            <tr>
+                                                <td>{{ session.date }}</td>
+                                                <td>{{ session.time }}</td>
+                                                <td>{{ session.capacity }}</td>
+                                                <td>{{ session.bookings }}/{{ session.capacity }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-danger" onclick="deleteSession('{{ session.id }}')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="images">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Activity Images</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="imageUploadForm" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">Add New Image</label>
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="previewImage(this)">
+                                </div>
+                                <img id="imagePreview" src="#" alt="Preview" style="max-width: 200px; display: none;" class="mb-3">
+                                <button type="submit" class="btn btn-primary">Upload Image</button>
+                            </form>
+                            <div class="row mt-4">
+                                {% for image in activity.images %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <img src="{{ image.url }}" class="card-img-top" alt="Activity Image">
+                                        <div class="card-body">
+                                            <button class="btn btn-danger btn-sm" onclick="deleteImage('{{ image.id }}')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="stats">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Profile Views</h6>
+                                            <h2 class="card-text">{{ stats.views }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Total Bookings</h6>
+                                            <h2 class="card-text">{{ stats.bookings }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Revenue (TND)</h6>
+                                            <h2 class="card-text">{{ stats.revenue }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="viewsChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartElement = document.getElementById('viewsChart');
+    if (chartElement) {
+        const ctx = chartElement.getContext('2d');
+        new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ stats.dates|tojson }},
+            datasets: [{
+                label: 'Profile Views',
+                data: {{ stats.view_counts|tojson }},
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        }
+    });
+});
+
+function deleteSession(sessionId) {
+    if (confirm('Are you sure you want to delete this session?')) {
+        fetch(`/api/activity/session/${sessionId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function deleteImage(imageId) {
+    if (confirm('Are you sure you want to delete this image?')) {
+        fetch(`/api/activity/image/${imageId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

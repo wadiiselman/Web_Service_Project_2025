@@ -1,0 +1,171 @@
+# Tunisia Tourism Platform Documentation
+
+## Project Overview
+A comprehensive digital tourism platform for Tunisia that provides intelligent travel experiences. The platform integrates geospatial data, user management, and tourism services including hotels, restaurants, activities, and transportation options.
+
+## Directory Structure
+```
+├── models/                 # Database models
+│   ├── __init__.py        # Models package initialization
+│   ├── base.py            # Base model class
+│   ├── user.py            # User model
+│   ├── hotel.py           # Hotel model
+│   ├── restaurant.py      # Restaurant model
+│   ├── activity.py        # Activity model
+│   └── transportation.py  # Transportation model
+├── routes/                # Route handlers
+│   ├── main.py           # Main routes
+│   ├── auth.py           # Authentication routes
+│   ├── hotel.py          # Hotel management
+│   ├── restaurant.py     # Restaurant management
+│   ├── activity.py       # Activity management
+│   └── transportation.py # Transportation routes
+├── schemas/              # Marshmallow schemas
+│   ├── base_schema.py   # Base schema class
+│   ├── user_schema.py   # User serialization
+│   └── [other]_schema.py
+├── templates/           # Jinja2 templates
+│   ├── base.html       # Base template
+│   ├── auth/          # Authentication templates
+│   └── dashboard/     # Dashboard templates
+├── static/            # Static assets
+├── app.py            # Application factory
+└── main.py           # Application entry point
+```
+
+## Core Components
+
+### Models
+- BaseModel: Abstract base class for all models
+- User: User authentication and profile management
+- Hotel: Hotel information and amenities
+- Restaurant: Restaurant details and menus
+- Activity: Tourist activities and bookings
+- Transportation: Travel options between locations
+
+### Schemas
+Marshmallow schemas for serialization/deserialization:
+- UserSchema: User data validation
+- HotelSchema: Hotel data validation
+- RestaurantSchema: Restaurant data validation
+- ActivitySchema: Activity data validation
+- TransportationSchema: Transportation data validation
+
+## API Endpoints
+
+### Authentication
+- POST /api/auth/login: User login
+- POST /api/auth/register: User registration
+- POST /api/auth/token/refresh: Refresh JWT token
+
+### Hotels
+- GET /api/hotels/<region>: List hotels in a region
+- POST /api/hotels/<region>: Create new hotel
+- GET /api/hotels/<hotel_id>: Get hotel details
+- PUT /api/hotels/<hotel_id>: Update hotel
+- GET /api/hotels/<hotel_id>/nearby: Get nearby places
+
+### Restaurants
+- GET /api/restaurants/: List all restaurants
+- POST /api/restaurants/: Create restaurant
+- GET /api/restaurants/<id>: Get restaurant details
+- PUT /api/restaurants/<id>: Update restaurant
+- GET /api/restaurants/nearby: Find nearby restaurants
+
+### Activities
+- GET /api/activities/: List all activities
+- POST /api/activities/: Create activity
+- GET /api/activities/<id>: Get activity details
+- PUT /api/activities/<id>: Update activity
+- GET /api/activities/nearby: Find nearby activities
+- GET /api/activities/region/<region>: Get regional activities
+
+### Transportation
+- GET /api/transportation/: List transportation options
+- POST /api/transportation/: Add transportation
+- GET /api/transportation/<id>: Get transport details
+- PUT /api/transportation/<id>: Update transport
+- GET /api/transportation/search: Search routes
+
+## Libraries & Dependencies
+
+### Core Framework
+- Flask: Lightweight WSGI web application framework
+- Flask-SQLAlchemy: ORM for database operations
+- Flask-Smorest: OpenAPI documentation and REST API support
+- Flask-JWT-Extended: JWT authentication handling
+- Flask-Login: User session management
+
+### Database
+- PostgreSQL: Primary database with PostGIS extension
+- SQLAlchemy: SQL toolkit and ORM
+- psycopg2-binary: PostgreSQL adapter for Python
+
+### API & Documentation
+- marshmallow: Object serialization/deserialization
+- apispec: OpenAPI specification generator
+- Flask-CORS: Cross-Origin Resource Sharing
+
+### Security & Validation
+- email-validator: Email validation
+- werkzeug: WSGI utilities including security features
+
+## Database Features
+- Geospatial queries for location-based services
+- JSON/JSONB support for flexible data storage
+- Full-text search capabilities
+- Efficient indexing for location queries
+- Transaction support for data integrity
+
+## Authentication & Authorization
+- JWT-based API authentication
+- Role-based access control
+- Session-based web authentication
+- Token refresh mechanism
+- Password hashing with Werkzeug
+
+## Development Guidelines
+
+### API Design
+- RESTful architecture
+- OpenAPI/Swagger documentation
+- Consistent error handling
+- Rate limiting support
+- Versioned API endpoints
+
+### Security Measures
+- CORS configuration
+- SQL injection prevention
+- XSS protection
+- CSRF protection
+- Secure password storage
+
+### Database Best Practices
+- Connection pooling
+- Migration support
+- Automated backups
+- Query optimization
+- Index management
+
+### Error Handling
+- Consistent error responses
+- Detailed logging
+- Transaction management
+- Validation error handling
+- Rate limit handling
+
+## Environment Configuration
+- DATABASE_URL: PostgreSQL connection string
+- FLASK_SECRET_KEY: Application secret key
+- JWT_SECRET_KEY: JWT token secret
+- FLASK_ENV: Development/Production mode
+- CORS_ORIGINS: Allowed origins for CORS
+
+## Deployment Considerations
+- PostgreSQL with PostGIS extension required
+- Python 3.11+ recommended
+- Redis optional for caching
+- Static file serving configuration
+- SSL/TLS configuration required for production
+
+This documentation provides an overview of the Tunisia Tourism Platform's architecture and implementation details. For specific implementation details, refer to the individual component files and inline documentation.

@@ -1,0 +1,136 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Hotels in {{ region|title }}</h2>
+    <div class="row">
+        <div class="col-md-8">
+            <div id="map" style="height: 400px;"></div>
+        </div>
+        <div class="col-md-4">
+            <div id="hotelResults">
+                <div class="list-group">
+                    {% for hotel in hotels %}
+                    <div class="card mb-3 hotel-card" 
+                         data-hotel-id="{{ hotel.id }}"
+                         data-lat="{{ hotel.latitude }}"
+                         data-lng="{{ hotel.longitude }}"
+                         data-name="{{ hotel.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ hotel.name }}</h5>
+                            <p class="card-text">{{ hotel.description }}</p>
+                            <p><strong>Price Range:</strong> {{ hotel.price_range }}</p>
+                            {% if hotel.rating %}
+                            <div class="mt-2">
+                                <span class="text-warning">
+                                    {% for i in range(hotel.rating|round|int) %}
+                                    <i class="fas fa-star"></i>
+                                    {% endfor %}
+                                </span>
+                                <small class="text-muted">({{ hotel.rating }})</small>
+                            </div>
+                            {% endif %}
+                            <button class="btn btn-sm btn-primary mt-2" onclick="showHotelDetails({{ hotel.id }})">
+                                Explore Hotel
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for showing hotel details -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hotel Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="hotelDetails"></div>
+                <div class="btn-group w-100 mt-3">
+                    <button class="btn btn-primary" onclick="showNearbyActivities(currentHotelId)">Show Nearby Activities</button>
+<button class="btn btn-secondary" onclick="redirectToNearbyRestaurants(currentHotelId)">
+    Show Nearby Restaurants
+</button>
+                </div>
+                <div id="nearbyPlaces" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/region_map.js"></script>
+<script>
+let currentHotelId = null;
+
+function showHotelDetails(hotelId) {
+    currentHotelId = hotelId;
+    fetch(`/api/hotels/${hotelId}`)
+        .then(response => response.json())
+        .then(hotel => {
+            const detailsHtml = `
+                <h4>${hotel.name}</h4>
+                <p>${hotel.description}</p>
+                <p><strong>Price Range:</strong> ${hotel.price_range}</p>
+                <p><strong>Location:</strong> ${hotel.latitude}, ${hotel.longitude}</p>
+                ${hotel.amenities ? `<p><strong>Amenities:</strong> ${Object.keys(hotel.amenities).join(', ')}</p>` : ''}
+            `;
+            document.getElementById('hotelDetails').innerHTML = detailsHtml;
+            document.getElementById('nearbyPlaces').innerHTML = '';
+            const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+            modal.show();
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function showNearbyActivities(hotelId) {
+    fetch(`/api/hotels/${hotelId}/nearby/activities`)
+        .then(response => response.json())
+        .then(data => {
+            const activities = data.nearby_activities;
+            document.getElementById('nearbyPlaces').innerHTML = `
+                <h5>Nearby Activities</h5>
+                <div class="list-group">
+                    ${activities.map(activity => `
+                        <div class="list-group-item">
+                            <h6>${activity.name}</h6>
+                            <p class="mb-1">${activity.description}</p>
+                            <small>Type: ${activity.type}</small>
+                            <small class="float-end">${activity.distance} km away</small>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function showNearbyRestaurants(hotelId) {
+    fetch(`/api/hotels/${hotelId}/nearby/restaurants`)
+        .then(response => response.json())
+        .then(data => {
+            const restaurants = data.nearby_restaurants;
+            // Store the restaurant data in localStorage
+            localStorage.setItem('nearbyRestaurants', JSON.stringify(restaurants));
+            // Redirect to activities.html
+            window.location.href = '/activities.html';
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function redirectToNearbyRestaurants(hotelId) {
+    window.location.href = `/hotels/${hotelId}/nearby-restaurants`;
+}
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+
+{% extends "base.html" %}
+
+{% block title %}Visitor Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Welcome to Tunisia Tourism Platform</h2>
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Hotels</h5>
+                            <p class="card-text">Browse and book hotels across Tunisia.</p>
+                            <a href="{{ url_for('main.explore') }}#hotels" class="btn btn-primary">View Hotels</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Restaurants</h5>
+                            <p class="card-text">Discover local cuisine and dining options.</p>
+                            <a href="{{ url_for('main.explore') }}#restaurants" class="btn btn-primary">View Restaurants</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Activities</h5>
+                            <p class="card-text">Find exciting activities and tours.</p>
+                            <a href="{{ url_for('main.explore') }}#activities" class="btn btn-primary">View Activities</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

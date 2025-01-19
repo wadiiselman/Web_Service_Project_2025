@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Restaurant Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Restaurant Dashboard</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Restaurant Profile</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('dashboard.dashboard') }}" id="restaurantForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Restaurant Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ restaurant.name if restaurant else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" required>{{ restaurant.description if restaurant else '' }}</textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="latitude" class="form-label">Latitude</label>
+                        <input type="number" step="any" class="form-control" id="latitude" name="latitude" value="{{ restaurant.latitude if restaurant else '' }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="longitude" class="form-label">Longitude</label>
+                        <input type="number" step="any" class="form-control" id="longitude" name="longitude" value="{{ restaurant.longitude if restaurant else '' }}" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="cuisine_type" class="form-label">Cuisine Type</label>
+                    <input type="text" class="form-control" id="cuisine_type" name="cuisine_type" value="{{ restaurant.cuisine_type if restaurant else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="price_range" class="form-label">Price Range</label>
+                    <select class="form-control" id="price_range" name="price_range" required>
+                        <option value="budget" {% if restaurant and restaurant.price_range == 'budget' %}selected{% endif %}>Budget</option>
+                        <option value="mid-range" {% if restaurant and restaurant.price_range == 'mid-range' %}selected{% endif %}>Mid Range</option>
+                        <option value="luxury" {% if restaurant and restaurant.price_range == 'luxury' %}selected{% endif %}>Luxury</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="region" class="form-label">Region</label>
+                    <input type="text" class="form-control" id="region" name="region" value="{{ restaurant.region if restaurant else '' }}" required>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5>Menu Items</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="menuItems">
+                            {% if restaurant and restaurant.menu %}
+                                {% for item in restaurant.menu %}
+                                <div class="row menu-item mb-2">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" name="menu_items[]" value="{{ item.item }}" placeholder="Item name">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="number" step="0.01" class="form-control" name="menu_prices[]" value="{{ item.price }}" placeholder="Price">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMenuItem(this)">Remove</button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <button type="button" class="btn btn-secondary mt-2" onclick="addMenuItem()">Add Menu Item</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+
+            {% if restaurant and restaurant.menu %}
+            <div class="mt-4">
+                <h5>Current Menu</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in restaurant.menu %}
+                        <tr>
+                            <td>{{ item.item }}</td>
+                            <td>${{ item.price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Statistics</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Profile Views</h5>
+                            <h3>{{ stats.views }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Total Bookings</h5>
+                            <h3>{{ stats.bookings }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Revenue</h5>
+                            <h3>{{ stats.revenue }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addMenuItem() {
+    const menuItems = document.getElementById('menuItems');
+    const newItem = document.createElement('div');
+    newItem.className = 'row menu-item mb-2';
+    newItem.innerHTML = `
+        <div class="col-md-6">
+            <input type="text" class="form-control" name="menu_items[]" placeholder="Item name" required>
+        </div>
+        <div class="col-md-4">
+            <input type="number" step="0.01" class="form-control" name="menu_prices[]" placeholder="Price" required>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeMenuItem(this)">Remove</button>
+        </div>
+    `;
+    menuItems.appendChild(newItem);
+}
+
+function removeMenuItem(button) {
+    button.closest('.menu-item').remove();
+}
+</script>
+{% endblock %}
